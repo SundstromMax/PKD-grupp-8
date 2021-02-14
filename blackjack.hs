@@ -40,3 +40,18 @@ gameLoop gs = do
 
 dealCards :: GameState -> GameState
 dealCards gs = gs
+
+cardValue :: Cardtypes -> Int
+cardValue Two = 2
+cardValue Three = 3
+cardValue Four = 4
+cardValue Five = 5
+cardValue Six = 6
+cardValue Seven = 7
+cardValue Eight = 8
+cardValue Nine = 9
+cardValue Ten = 10
+cardValue Jack = 10
+cardValue Queen = 10
+cardValue King = 10
+cardValue Ace = 11
