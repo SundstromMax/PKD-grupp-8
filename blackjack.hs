@@ -1,5 +1,7 @@
 module Blackjack(main) where
 
+import System.Exit
+
 data Cardtypes = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack | Queen | King | Ace deriving (Show,Eq, Enum)
 data Suits = Spades | Clubs | Diamonds | Hearts deriving(Show, Eq, Enum)
 data Card = Card Cardtypes Suits deriving(Show, Eq)
@@ -20,7 +22,7 @@ menu = do
     putStrLn "Welcome to our blackjack game! \n Play \n Quit"
     answer <- getLine 
     let choice  | answer == "Play" = gameLoop initState
-                | answer == "Quit" = putStrLn "Quit this shit" {- TODO Quit funktion-}
+                | answer == "Quit" = exitSuccess
                 | otherwise = menu
     choice      
 
@@ -41,6 +43,12 @@ gameLoop gs = do
 dealCards :: GameState -> GameState
 dealCards gs = gs
 
+
+calculateHand :: Hand -> Int
+calculateHand [] = 0
+calculateHand (x:_) = cardValue x
+calculateHand (x:xs) = cardValue x + CalculateHand xs
+
 cardValue :: Cardtypes -> Int
 cardValue Two = 2
 cardValue Three = 3
@@ -55,9 +63,3 @@ cardValue Jack = 10
 cardValue Queen = 10
 cardValue King = 10
 cardValue Ace = 11
-
-calculateHand :: Hand -> Int
-calculateHand [] = 0
-calculateHand (x:_) = cardValue x
-calculateHand (x:xs) = cardValue x + CalculateHand xs
-
