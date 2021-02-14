@@ -38,7 +38,7 @@ makeDeck = [Card cardtypes suits | cardtypes <- [Two ..], suits <- [Spades ..]]
 
 gameLoop :: GameState -> IO()
 gameLoop gs = do
-    putStrLn . show $ deck gs
+    putStrLn. show . gameOver $ deck gs
 
 dealCards :: GameState -> GameState
 dealCards gs = gs
@@ -46,20 +46,23 @@ dealCards gs = gs
 
 calculateHand :: Hand -> Int
 calculateHand [] = 0
-calculateHand (x:_) = cardValue x
-calculateHand (x:xs) = cardValue x + CalculateHand xs
+calculateHand (x:[]) = cardValue x  
+calculateHand (x:xs) = cardValue x + calculateHand xs
 
-cardValue :: Cardtypes -> Int
-cardValue Two = 2
-cardValue Three = 3
-cardValue Four = 4
-cardValue Five = 5
-cardValue Six = 6
-cardValue Seven = 7
-cardValue Eight = 8
-cardValue Nine = 9
-cardValue Ten = 10
-cardValue Jack = 10
-cardValue Queen = 10
-cardValue King = 10
-cardValue Ace = 11
+cardValue :: Card -> Int
+cardValue (Card Two _) = 2
+cardValue (Card Three _) = 3
+cardValue (Card Four _) = 4
+cardValue (Card Five _) = 5
+cardValue (Card Six _) = 6
+cardValue (Card Seven _) = 7
+cardValue (Card Eight _) = 8
+cardValue (Card Nine _) = 9
+cardValue (Card Ten  _) = 10
+cardValue (Card Jack _) = 10
+cardValue (Card Queen _) = 10
+cardValue (Card King _) = 10
+cardValue (Card Ace _) = 11
+
+gameOver :: Hand -> Bool
+gameOver hand = calculateHand hand > 21
