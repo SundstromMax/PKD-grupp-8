@@ -43,6 +43,12 @@ gameLoop gs = do
 dealCards :: GameState -> GameState
 dealCards gs = gs
 
+
+calculateHand :: Hand -> Int
+calculateHand [] = 0
+calculateHand (x:_) = cardValue x
+calculateHand (x:xs) = cardValue x + CalculateHand xs
+
 cardValue :: Cardtypes -> Int
 cardValue Two = 2
 cardValue Three = 3
