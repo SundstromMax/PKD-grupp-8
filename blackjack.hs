@@ -24,8 +24,8 @@ menu :: IO()
 menu = do
     putStrLn "Welcome to our blackjack game! \n Play \n Quit"
     answer <- getLine 
-    let choice  | answer == "Play" = gameLoop initState
-                | answer == "Quit" = putStrLn "Quit this shit" {- TODO Quit funktion-}
+    let choice  | answer == "Play" = gameStart initState
+                | answer == "Quit" = print "Quit this shit" {- TODO Quit funktion-}
                 | otherwise = menu
     choice      
 
@@ -36,16 +36,13 @@ initState = GameState {
     dealerHand = []
 }
 
-calculateHand (Card a _):xs
-
 makeDeck :: Deck
 makeDeck = [Card cardtypes suits | cardtypes <- [Two ..], suits <- [Spades ..]]
 
-gameLoop :: GameState -> IO()
-gameLoop gs = do
-    putStrLn . show $ deck gs
-    
-    putStrLn . show $ deck $ drawCard gs 
+gameStart :: GameState -> IO()
+gameStart gs = do
+    print . show $ deck gs
+    if null(deck gs) then menu else gameStart $ drawCard gs
 
 drawCard :: GameState -> GameState
 drawCard gs = dealerDrawCard $ playerDrawCard gs
