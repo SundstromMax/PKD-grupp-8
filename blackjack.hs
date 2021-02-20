@@ -2,6 +2,7 @@ module Blackjack(main) where
 
 import System.Random
 import System.Exit
+import Data.Text as T
 
 data Cardtypes = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack | Queen | King | Ace deriving (Show,Eq, Enum)
 data Suits = Spades | Clubs | Diamonds | Hearts deriving(Show, Eq, Enum)
@@ -23,16 +24,17 @@ main = menu
 
 menu :: IO()
 menu = do
-    putStrLn "Welcome to our blackjack game! \n Play \n Quit"
+    putStrLn "\ESC[2JWelcome to our blackjack game! \n Play \n Quit"
+    --putStrLn "Welcome to our blackjack game! \n Play \n Quit"
     answer <- getLine 
-    let choice  | answer == "Play" = gameStart initState
-                | answer == "Quit" = exitSuccess
+    let choice  | toUpper (pack answer) == pack "PLAY" = gameStart initState
+                | toUpper (pack answer) == pack "QUIT" = exitSuccess
                 | otherwise = menu
     choice      
 
 initState :: GameState
 initState = GameState {
-    deck = makeDeck,
+    deck = makeDeck, --TODO: randomize order of deck
     playerHand = [],
     dealerHand = []
 }
@@ -42,17 +44,36 @@ makeDeck = [Card cardtypes suits | cardtypes <- [Two ..], suits <- [Spades ..]]
 
 gameStart :: GameState -> IO()
 gameStart gs = do
-    print . show $ deck gs
-    if null(deck gs) then menu else gameStart $ drawCard gs
+    if Prelude.null(deck gs) then menu else hitOrStand $ drawCard $ drawCard gs
+
+hitOrStand :: GameState -> IO ()
+hitOrStand gs = do
+    putStrLn $ "\ESC[2J" ++ show (playerHand gs) ++ " " ++ show (calculateHand $ playerHand gs)
+    print . show $ Prelude.head $ dealerHand gs
+    putStrLn "Do you want to Hit or Stand?"
+    answer <- getLine
+    let choice  | toUpper (pack answer) == pack "HIT" = hit gs
+                | toUpper (pack answer) == pack "STAND" = stand gs
+                | otherwise = menu
+    choice 
+
+hit :: GameState -> IO ()
+hit gs  
+    | gameOver $ playerHand (playerDrawCard gs) = menu
+    | otherwise = hitOrStand $ playerDrawCard gs
+
+stand :: GameState -> IO ()
+stand gs = do
+    print . calculateHand $ playerHand gs
 
 drawCard :: GameState -> GameState
 drawCard gs = dealerDrawCard $ playerDrawCard gs
 
 playerDrawCard :: GameState -> GameState
-playerDrawCard gs = gs { playerHand = playerHand gs ++ [head $ deck gs], deck = tail $ deck gs}
+playerDrawCard gs = gs { playerHand = playerHand gs ++ [Prelude.head $ deck gs], deck = Prelude.tail $ deck gs}
 
 dealerDrawCard :: GameState -> GameState
-dealerDrawCard gs = gs { dealerHand = dealerHand gs ++ [head $ deck gs], deck = tail $ deck gs}
+dealerDrawCard gs = gs { dealerHand = dealerHand gs ++ [Prelude.head $ deck gs], deck = Prelude.tail $ deck gs}
 
 calculateHand :: Hand -> Int
 calculateHand [] = 0
