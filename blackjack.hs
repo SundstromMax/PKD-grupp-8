@@ -141,3 +141,27 @@ cardValue (Card Ace _) = 11
 -}
 gameOver :: Hand -> Bool
 gameOver hand = calculateHand hand > 21
+
+printCard :: Card -> IO()
+printCard (Card value suits) = do putStrLn " ________________\n|suits           |\n|                |\n|                |\n|                |\n|                |\n|                |\n|                |\n|     value      |\n|                |\n|                |\n|                |\n|                |\n|                |\n|                |\n|           suits|\n|________________|"
+
+
+{- 
+ _________________
+|suits           |
+|                |
+|                |
+|                |
+|                |
+|                |
+|                |
+|     value      |
+|                |
+|                |
+|                |
+|                |
+|                |
+|                |
+|           suits|
+|________________|
+-}
