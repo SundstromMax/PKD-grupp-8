@@ -28,7 +28,6 @@ instance Show Card where
 main :: IO()
 main = menu
 
-
 {- menu
    Prints the main menu where user can type in input depending on what they want to do.
    SIDE EFFECT: Prints out messages to terminal and waits for input from user.
@@ -44,7 +43,6 @@ menu = do
                 | toUpper (pack answer) == pack "QUIT" = exitSuccess
                 | otherwise = menu
     choice
-
 
 {- initState
    Initialize the gamestate variables
@@ -173,14 +171,9 @@ cardValue (Card Queen _) = 10
 cardValue (Card King _) = 10
 cardValue (Card Ace _) = 11
 
-
 handToString :: Hand -> String
 handToString (x:[]) = show x
 handToString (x:xs) = show x ++ ", " ++ handToString xs
-
-gameOver :: Hand -> Bool
-gameOver hand = calculateHand hand > 21
-
 
 -- Got from https://wiki.haskell.org/Random_shuffle
 fisherYatesStep :: RandomGen g => (Map Int a, g) -> (Int, a) -> (Map Int a, g)
@@ -210,7 +203,6 @@ gameOver hand = calculateHand hand > 21
 
 printCard :: Card -> IO()
 printCard (Card value suits) = do putStrLn " ________________\n|suits           |\n|                |\n|                |\n|                |\n|                |\n|                |\n|                |\n|     value      |\n|                |\n|                |\n|                |\n|                |\n|                |\n|                |\n|           suits|\n|________________|"
-
 
 {- 
  _________________
