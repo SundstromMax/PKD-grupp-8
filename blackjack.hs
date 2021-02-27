@@ -31,7 +31,7 @@ main = menu
 {- menu
    Prints the main menu where user can type in input depending on what they want to do.
    SIDE EFFECT: Prints out messages to terminal and waits for input from user.
-   EXAMPLES: menu == prints "Play" and "Quit" in the terminal and waits for user input.
+   EXAMPLES: menu == prints messages in the terminal and waits for user input.
 -}
 menu :: IO()
 menu = do
@@ -72,7 +72,7 @@ makeDeck = [Card cardtypes suits | cardtypes <- [Two ..], suits <- [Spades ..]]
 gameStart :: GameState -> IO()
 gameStart gs = do
     
-    hitOrStand $ drawCard $ drawCard gs
+    blackJack $ drawCard $ drawCard gs
 
 hitOrStand :: GameState -> IO ()
 hitOrStand gs = do
@@ -200,6 +200,18 @@ fisherYates gen l =
 -}
 gameOver :: Hand -> Bool
 gameOver hand = calculateHand hand > 21
+
+
+{- blackJack gamestate
+   Checks if player has blackjack
+   SIDE EFFECT: Prints out messagees to terminal and waits for input from user.   
+   EXAMPLES: blackjack gamestate == prints messages in the terminal and waits for user input
+-}
+blackJack :: GameState -> IO()
+blackJack gs = do 
+   if (calculateHand (playerHand gs) == 21)
+   then win gs 
+   else hitOrStand gs
 
 printCard :: Card -> IO()
 printCard (Card value suits) = do putStrLn " ________________\n|suits           |\n|                |\n|                |\n|                |\n|                |\n|                |\n|                |\n|     value      |\n|                |\n|                |\n|                |\n|                |\n|                |\n|                |\n|           suits|\n|________________|"
