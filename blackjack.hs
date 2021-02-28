@@ -102,7 +102,7 @@ hitOrStand gs = do
 -}
 hit :: GameState -> IO ()
 hit gs
-    | gameOver $ playerHand (playerDrawCard gs) = menu
+    | gameOver $ playerHand (playerDrawCard gs) = lose gs
     | otherwise = hitOrStand $ playerDrawCard gs
 
 {- stand gamestate
