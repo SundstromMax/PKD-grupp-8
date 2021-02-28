@@ -2,9 +2,7 @@ module Blackjack where
 import System.Random ( mkStdGen, Random(randomR), RandomGen, StdGen )
 import System.Exit (exitSuccess)
 import Data.Text     (pack, toUpper)
-import Data.Function (on)
 import Data.List     (sortBy)
-import Test.HUnit ()
 import Data.Map (Map, insert, elems, singleton, (!))
 
 data Cardtypes = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack | Queen | King | Ace deriving (Show,Eq, Enum)
