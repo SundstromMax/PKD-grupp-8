@@ -5,12 +5,24 @@ import Data.Text     (pack, toUpper)
 import Data.List     (sortBy)
 import Data.Map (Map, insert, elems, singleton, (!))
 
+{-Data structure used for representing the values a playing card can have-}
 data Cardtypes = Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Jack | Queen | King | Ace deriving (Show,Eq, Enum)
+
+{-Data structure used for representing the suits-}
 data Suits = Spades | Clubs | Diamonds | Hearts deriving(Show, Eq, Enum)
+
+{-Data structure to represent a card -}
 data Card = Card Cardtypes Suits deriving(Eq)
+
+{-Data type to represent a Deck -}
 type Deck = [Card]
+
+{-Data type to represent a Hand -}
 type Hand = [Card]
 
+{- Data structure to represent the game state
+   Variables need to be updated during a game of blackjack to keep track of who has which cards. 
+-}
 data GameState = GameState{
     deck :: Deck,
     playerHand :: Hand,
