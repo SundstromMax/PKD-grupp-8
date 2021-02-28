@@ -86,7 +86,7 @@ gameStart gs = do
 -}
 hitOrStand :: GameState -> IO ()
 hitOrStand gs = do
-    putStrLn $ "\ESC[2J" ++ "Player's hand: " ++ handToString (playerHand gs) ++ "\n Current value of hand: " ++ show (calculateHand $ playerHand gs)
+    putStrLn $ "\ESC[2J" ++ "Player's hand: " ++ handToString (playerHand gs) ++ "\n Current value of hand: " ++ show (calculateAceHand $ playerHand gs)
     putStrLn $ "Dealer's hand: " ++ handToString [head $ dealerHand gs]
     putStrLn "Do you want to Hit or Stand?"
     answer <- getLine
@@ -112,7 +112,7 @@ hit gs
 -}
 stand :: GameState -> IO ()
 stand gs = do
-    if calculateHand (dealerHand gs) > 17 then calculateResult gs else
+    if calculateAceHand (dealerHand gs) > 17 then calculateResult gs else
         stand $ dealerDrawCard gs
 
 {- calculateResult gamestate
@@ -122,8 +122,8 @@ stand gs = do
 -}
 calculateResult :: GameState -> IO ()
 calculateResult gs = do
-    if calculateHand (dealerHand gs) > 21 then win gs else
-        if calculateHand (dealerHand gs) >= calculateHand (playerHand gs) then lose gs else win gs
+    if gameOver(dealerHand gs) then win gs else
+        if calculateAceHand (dealerHand gs) >= calculateAceHand (playerHand gs) then lose gs else win gs
 
 {- win gamestate
    Prints the winner interface
@@ -132,7 +132,7 @@ calculateResult gs = do
 -}
 win :: GameState -> IO ()
 win gs = do
-    putStrLn $ "\ESC[2J" ++ "Win\n Dealers hand: " ++ handToString (dealerHand gs) ++ "\n Value of dealers hand: " ++ show (calculateHand $ dealerHand gs)
+    putStrLn $ "\ESC[2J" ++ "Win\n Dealers hand: " ++ handToString (dealerHand gs) ++ "\n Value of dealers hand: " ++ show (calculateAceHand $ dealerHand gs)
 
 {- lose gamestate
    Prints the loser interface
@@ -141,7 +141,7 @@ win gs = do
 -}
 lose :: GameState -> IO ()
 lose gs = do
-    putStrLn $ "\ESC[2J" ++ "Lose\n Dealers hand: " ++ handToString (dealerHand gs) ++ "\n Value of dealers hand: " ++ show (calculateHand $ dealerHand gs)
+    putStrLn $ "\ESC[2J" ++ "Lose\n Dealers hand: " ++ handToString (dealerHand gs) ++ "\n Value of dealers hand: " ++ show (calculateAceHand $ dealerHand gs)
 
 {-drawCard gamestate
   2 cards is removed from "deck" and "dealerHand" and "playerHand" recieves one each.
@@ -175,13 +175,36 @@ dealerDrawCard gs = gs { dealerHand = dealerHand gs ++ [head $ deck gs], deck = 
    RETURNS: The integer value of "hand"
    EXAMPLES: calculateHand [] == 0
              calculateHand [Two Of Spades,Two Of Clubs] == 4
-             calculateHand [King Of Spades,King Of Clubs,King Of Diamonds] == 30
-             
+             calculateHand [King Of Spades,King Of Clubs,King Of Diamonds] == 30        
 -}
 calculateHand :: Hand -> Int
 calculateHand [] = 0
 calculateHand (x:[]) = cardValue x
 calculateHand (x:xs) = cardValue x + calculateHand xs
+
+{- hasAce hand
+   Checks if "hand" contains an Ace
+   RETURNS: A boolean depending on if "hand" contains an ace
+   EXAMPLES: hasAce [Two Of Spades,Two Of Clubs] == False
+             hasAce [Ace Of Spades,Two Of Clubs] == True
+             hasAce [King Of Spades,King Of Clubs,Ace Of Diamonds,Two Of Spades] == True         
+-}
+hasAce :: Hand -> Bool
+hasAce [] = False 
+hasAce ((Card Ace _): _) = True 
+hasAce (x:xs) = hasAce xs
+
+{- calculateAceHand hand
+   Checks if the Aces should have the value 1 or 11
+   RETURNS: The integer value of "hand" in regard to the Aces.
+   EXAMPLES: calculateAceHand [] == 0
+             calculateAceHand [Ace Of Spades, Ace Of Hearts] == 12
+             calculateAceHand [Ace Of Spades, King Of Hearts, King Of Spades] == 21
+             calculateAceHand [Two Of Spades, Three Of Hearts, Ace Of Hearts] == 16     
+-}
+calculateAceHand :: Hand -> Int
+calculateAceHand [] = 0
+calculateAceHand hand = if hasAce hand && (calculateHand hand + 10 <= 21) then calculateHand hand + 10 else calculateHand hand
 
 {- cardValue card
    Gives the card a integer value.
@@ -204,7 +227,7 @@ cardValue (Card Ten  _) = 10
 cardValue (Card Jack _) = 10
 cardValue (Card Queen _) = 10
 cardValue (Card King _) = 10
-cardValue (Card Ace _) = 11
+cardValue (Card Ace _) = 1
 
 {- handToString hand
    Changes the "hand" to a printable string
@@ -242,7 +265,7 @@ fisherYates gen l =
              gameOver [Eight Of Clubs,Two Of Spades,Six Of Spades] == False
 -}
 gameOver :: Hand -> Bool
-gameOver hand = calculateHand hand > 21
+gameOver hand = calculateAceHand hand > 21
 
 
 {- blackJack gamestate
@@ -252,7 +275,7 @@ gameOver hand = calculateHand hand > 21
 -}
 blackJack :: GameState -> IO()
 blackJack gs = do 
-   if (calculateHand (playerHand gs) == 21)
+   if calculateAceHand (playerHand gs) == 21
    then win gs 
    else hitOrStand gs
 
