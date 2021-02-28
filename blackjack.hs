@@ -23,7 +23,7 @@ instance Show Card where
     show (Card cardtypes suits) = show cardtypes ++ " Of " ++ show suits
 
 {- main
-   TODO
+   TODO TODO TODO TODO TODO TODO TODO
 -}
 main :: IO()
 main = menu
@@ -69,11 +69,21 @@ initState seed = GameState {
 makeDeck :: Deck
 makeDeck = [Card cardtypes suits | cardtypes <- [Two ..], suits <- [Spades ..]]
 
+{- gameStart gamestate
+   Starts a game of blackjack
+   SIDE EFFECTS: Prints out messages to terminal and waits for input from user.
+   EXAMPLE: gameStart gamestate == prints messages in the terminal and waits for user input
+-}
 gameStart :: GameState -> IO()
 gameStart gs = do
     
     blackJack $ drawCard $ drawCard gs
 
+{- hitOrStand gamestate
+   The interface where the user gets to decide if they want to hit or stand
+   SIDE EFFECTS: Prints out messages to terminal and waits for input from user.      
+   EXAMPLE: hitOrStand gamestate == prints messages in the terminal and waits for user input
+-}
 hitOrStand :: GameState -> IO ()
 hitOrStand gs = do
     putStrLn $ "\ESC[2J" ++ "Player's hand: " ++ handToString (playerHand gs) ++ "\n Current value of hand: " ++ show (calculateHand $ playerHand gs)
@@ -85,25 +95,50 @@ hitOrStand gs = do
                 | otherwise = hitOrStand gs
     choice
 
+{- hit gamestate
+   Gives the player a new card from the deck and checks if the player busts
+   SIDE EFFECTS: Prints out messages to terminal and waits for input from user.
+   EXAMPLE: hit gamestate == prints messages in the terminal and waits for user input     
+-}
 hit :: GameState -> IO ()
 hit gs
     | gameOver $ playerHand (playerDrawCard gs) = menu
     | otherwise = hitOrStand $ playerDrawCard gs
 
+{- stand gamestate
+   Enabling the player to stand
+   SIDE EFFECTS: Prints out messages to terminal and waits for input from user.
+   EXAMPLE: stand gamestate == prints messages in the terminal and waits for user input
+-}
 stand :: GameState -> IO ()
 stand gs = do
     if calculateHand (dealerHand gs) > 17 then calculateResult gs else
         stand $ dealerDrawCard gs
 
+{- calculateResult gamestate
+   Calculates if the dealer or player has won.
+   SIDE EFFECTS: Prints out messages to terminal and waits for input from user.
+   EXAMPLE: calculateResult gamestate == prints messages in the terminal and waits for user input     
+-}
 calculateResult :: GameState -> IO ()
 calculateResult gs = do
     if calculateHand (dealerHand gs) > 21 then win gs else
         if calculateHand (dealerHand gs) >= calculateHand (playerHand gs) then lose gs else win gs
 
+{- win gamestate
+   Prints the winner interface
+   SIDE EFFECTS: Prints out messages to terminal and waits for input from user.
+   EXAMPLE: win gamestate == prints messages in the terminal and waits for user input
+-}
 win :: GameState -> IO ()
 win gs = do
     putStrLn $ "\ESC[2J" ++ "Win\n Dealers hand: " ++ handToString (dealerHand gs) ++ "\n Value of dealers hand: " ++ show (calculateHand $ dealerHand gs)
 
+{- lose gamestate
+   Prints the loser interface
+   SIDE EFFECTS: Prints out messages to terminal and waits for input from user.
+   EXAMPLE: lose gamestate == prints messages in the terminal and waits for user input  
+-}
 lose :: GameState -> IO ()
 lose gs = do
     putStrLn $ "\ESC[2J" ++ "Lose\n Dealers hand: " ++ handToString (dealerHand gs) ++ "\n Value of dealers hand: " ++ show (calculateHand $ dealerHand gs)
@@ -171,6 +206,14 @@ cardValue (Card Queen _) = 10
 cardValue (Card King _) = 10
 cardValue (Card Ace _) = 11
 
+{- handToString hand
+   Changes the "hand" to a printable string
+   PRE: hand != []
+   RETURNS: A string representation of hand
+   EXAMPLES: handToString [Two Of Spades] == "Two Of Spades"
+             handToString [Two Of Spades,Two Of Clubs] == "Two Of Spades, Two Of Clubs"
+             handToString [Two Of Spades,Two Of Clubs,King Of Spades] == "Two Of Spades, Two Of Clubs, King Of Spades"              
+-}
 handToString :: Hand -> String
 handToString (x:[]) = show x
 handToString (x:xs) = show x ++ ", " ++ handToString xs
