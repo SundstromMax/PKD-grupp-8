@@ -11,3 +11,4 @@ https://docs.google.com/document/d/1CHyIDxalHK0Ake6exj8IdAs67vZtkixUqi5b-CgkSp4/
 Link to Williams diary
 
 Link to Samuels diary
+https://docs.google.com/document/d/10bBePRbyUQNIt1AfxbmdENvY8zq34QzOIdkHnpjHF-o/edit?usp=sharing
