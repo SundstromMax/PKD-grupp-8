@@ -28,7 +28,7 @@ testCardValue2 = TestCase $ assertEqual "Card value wrong" (cardValue $ Card Kin
 
 {-Tests if the toString function works correctly-}
 testHandToString :: Test
-testHandToString = TestCase $ assertEqual "Card value wrong" (handToString [Card Ace Spades, Card Five Hearts]) "Ace Of Spades, Five Of Hearts"
+testHandToString = TestCase $ assertEqual "Card value wrong" (handToString [Card Ace Spades, Card Five Hearts]) "Ace Of Spades\n     | Five Of Hearts"
 
 {-Tests if the hasAce works correctly-}
 testHasAce :: Test

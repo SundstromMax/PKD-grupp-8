@@ -45,10 +45,17 @@ main = menu
 -}
 menu :: IO()
 menu = do
-    putStrLn "\ESC[2JEnter Current time on format mdhms(Month, Day, Hour, Minute, Second"
+    putStrLn "\ESC[2J"
+    putStrLn "Enter Current time on format mmddhhmm(Month, Day, Hour, Minute)"
     seed <- getLine 
-    putStrLn "\ESC[2JWelcome to our blackjack game! \n Play \n Quit"
+    putStrLn "\ESC[2J"
+    putStrLn "-----------------------------\n"
+    printCard
+    putStrLn ""
+    putStrLn "    Welcome to blackjack! \n           Play \n           Quit\n"
+    putStrLn "-----------------------------\n"
     answer <- getLine
+    putStrLn $ "\ESC[2J"
     let choice  | toUpper (pack answer) == pack "PLAY" = gameStart $ initState $ read seed
                 | toUpper (pack answer) == pack "QUIT" = exitSuccess
                 | otherwise = menu
@@ -96,10 +103,19 @@ gameStart gs = do
 -}
 hitOrStand :: GameState -> IO ()
 hitOrStand gs = do
-    putStrLn $ "\ESC[2J" ++ "Player's hand: " ++ handToString (playerHand gs) ++ "\n Current value of hand: " ++ show (calculateAceHand $ playerHand gs)
-    putStrLn $ "Dealer's hand: " ++ handToString [head $ dealerHand gs]
-    putStrLn "Do you want to Hit or Stand?"
+    putStrLn "----------------------------------------------\n"
+    putStrLn "    Dealer's hand:" 
+    putStrLn $ "     | " ++ handToString [head $ dealerHand gs]
+    putStrLn $ "     Current value of dealer's hand is " ++ show (cardValue $ head $ dealerHand gs)
+    putStrLn ""
+    putStrLn "    Your hand:"
+    putStrLn $ "     | " ++ handToString (playerHand gs)
+    putStrLn $ "     Current value of your hand is " ++ show (calculateAceHand $ playerHand gs)
+    putStrLn ""
+    putStrLn "         Do you want to Hit or Stand?\n"
+    putStrLn "----------------------------------------------"
     answer <- getLine
+    putStrLn $ "\ESC[2J"
     let choice  | toUpper (pack answer) == pack "HIT" = hit gs
                 | toUpper (pack answer) == pack "STAND" = stand gs
                 | otherwise = hitOrStand gs
@@ -111,9 +127,12 @@ hitOrStand gs = do
    EXAMPLE: hit gamestate == prints messages in the terminal and waits for user input     
 -}
 hit :: GameState -> IO ()
-hit gs
-    | gameOver $ playerHand (playerDrawCard gs) = lose gs
-    | otherwise = hitOrStand $ playerDrawCard gs
+hit gs = do
+    putStrLn $ "     You hit and draw " ++ handToString [head (deck gs)]
+    putStrLn ""
+    if gameOver $ playerHand (playerDrawCard gs) 
+       then lose $ playerDrawCard gs
+       else hitOrStand $ playerDrawCard gs
 
 {- stand gamestate
    Enabling the player to stand
@@ -142,7 +161,24 @@ calculateResult gs = do
 -}
 win :: GameState -> IO ()
 win gs = do
-    putStrLn $ "\ESC[2J" ++ "Win\n Dealers hand: " ++ handToString (dealerHand gs) ++ "\n Value of dealers hand: " ++ show (calculateAceHand $ dealerHand gs)
+    putStrLn "----------------------------------------------\n"
+    putStrLn "                  You win!"
+    putStrLn ""
+    putStrLn "    Dealer's hand:" 
+    putStrLn $ "     | " ++ handToString (dealerHand gs)
+    putStrLn $ "     Value of dealer's hand is " ++ show (calculateAceHand $ dealerHand gs)
+    putStrLn ""
+    putStrLn "    Your hand:"
+    putStrLn $ "     | " ++ handToString (playerHand gs)
+    putStrLn $ "     Value of your hand is " ++ show (calculateAceHand $ playerHand gs)
+    putStrLn ""
+    putStrLn "       Type anything to go back to menu"
+    putStrLn ""
+    putStrLn "----------------------------------------------"
+    answer <- getLine
+    putStrLn $ "\ESC[2J"
+    menu
+    
 
 {- lose gamestate
    Prints the loser interface
@@ -151,7 +187,23 @@ win gs = do
 -}
 lose :: GameState -> IO ()
 lose gs = do
-    putStrLn $ "\ESC[2J" ++ "Lose\n Dealers hand: " ++ handToString (dealerHand gs) ++ "\n Value of dealers hand: " ++ show (calculateAceHand $ dealerHand gs)
+    putStrLn "----------------------------------------------\n"
+    putStrLn "                  You lose!"
+    putStrLn ""
+    putStrLn "    Dealer's hand:" 
+    putStrLn $ "     | " ++ handToString (dealerHand gs)
+    putStrLn $ "     Value of dealer's hand is " ++ show (calculateAceHand $ dealerHand gs)
+    putStrLn ""
+    putStrLn "    Your hand:"
+    putStrLn $ "     | " ++ handToString (playerHand gs)
+    putStrLn $ "     Value of your hand is " ++ show (calculateAceHand $ playerHand gs)
+    putStrLn ""
+    putStrLn "       Type anything to go back to menu"
+    putStrLn ""
+    putStrLn "----------------------------------------------"
+    answer <- getLine
+    putStrLn $ "\ESC[2J"
+    menu
 
 {-drawCard gamestate
   2 cards is removed from "deck" and "dealerHand" and "playerHand" recieves one each.
@@ -249,7 +301,7 @@ cardValue (Card Ace _) = 1
 -}
 handToString :: Hand -> String
 handToString (x:[]) = show x
-handToString (x:xs) = show x ++ ", " ++ handToString xs
+handToString (x:xs) = show x ++ "\n     | " ++ handToString xs
 
 -- Got from https://wiki.haskell.org/Random_shuffle
 fisherYatesStep :: RandomGen g => (Map Int a, g) -> (Int, a) -> (Map Int a, g)
@@ -289,25 +341,23 @@ blackJack gs = do
    then win gs 
    else hitOrStand gs
 
-printCard :: Card -> IO()
-printCard (Card value suits) = do putStrLn " ________________\n|suits           |\n|                |\n|                |\n|                |\n|                |\n|                |\n|                |\n|     value      |\n|                |\n|                |\n|                |\n|                |\n|                |\n|                |\n|           suits|\n|________________|"
+printCard :: IO()
+printCard = do putStrLn "      ________________\n     |                |\n     | A              |\n     |                |\n     |                |\n     |                |\n     |                |\n     |       <3       |\n     |                |\n     |                |\n     |                |\n     |                |\n     |                |\n     |              A |\n     |________________|"
 
 {- 
- _________________
-|suits           |
+ ________________
+|                |
+| A              |
+|                |
+|                |
+|                |
+|                |
+|       <3       |
 |                |
 |                |
 |                |
 |                |
 |                |
-|                |
-|     value      |
-|                |
-|                |
-|                |
-|                |
-|                |
-|                |
-|           suits|
+|              A |
 |________________|
 -}
