@@ -33,7 +33,8 @@ instance Show Card where
     show (Card cardtypes suits) = show cardtypes ++ " Of " ++ show suits
 
 {- main
-   TODO TODO TODO TODO TODO TODO TODO
+   Starts the chain of functions calling each other by calling the menu function
+   SIDE EFFECTS: Prints out messages to terminal and waits for input from user.
 -}
 main :: IO()
 main = menu
