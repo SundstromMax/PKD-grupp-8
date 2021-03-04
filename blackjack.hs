@@ -305,11 +305,21 @@ handToString (x:[]) = show x
 handToString (x:xs) = show x ++ "\n     | " ++ handToString xs
 
 -- Got from https://wiki.haskell.org/Random_shuffle
+{- fisherYatesStep
+   Help function for fisherYates              
+-}
 fisherYatesStep :: RandomGen g => (Map Int a, g) -> (Int, a) -> (Map Int a, g)
 fisherYatesStep (m, gen) (i, x) = ((insert j x . insert i (m ! j)) m, gen')
   where
     (j, gen') = randomR (0, i) gen
 
+{- fisherYates randomGen list
+   Randomly shuffles a list
+   RETURNS: A tuple where the first element is a randomly shuffled version of the original list and the second is a random generator
+   EXAMPLES: fisherYates (mkStdGen 1) [1, 2, 3, 4, 5] == ([1,4,5,3,2],879767458 1872071452)
+             fisherYates (mkStdGen 2) ["a", "b", "c", "d", "e"] == (["c","e","d","a","b"],1319651187 1872071452)
+             fisherYates (mkStdGen 3) [True, False, True, False, True] == ([True,False,True,True,False],1759534916 1872071452)             
+-}
 fisherYates :: RandomGen g => g -> [a] -> ([a], g)
 fisherYates gen [] = ([], gen)
 fisherYates gen l =
