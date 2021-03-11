@@ -30,7 +30,8 @@ data GameState = GameState{
 } deriving(Show)
 
 instance Show Card where
-    show (Card cardtypes suits) = show cardtypes ++ " Of " ++ show suits
+   show (Card cardtypes suits) = show cardtypes ++ " Of " ++ show suits
+
 
 {- main
    Starts the chain of functions calling each other by calling the menu function
@@ -76,13 +77,13 @@ initState seed = GameState {
 {- makeDeck
    Creates a deck of cards.
    RETURNS: a "deck"
-   EXAMPLE: makeDeck == "[Two Of Spades,Two Of Clubs,Two Of Diamonds,Two Of Hearts,Three Of Spades,Three Of Clubs,Three Of Diamonds,Three Of Hearts,
-   Four Of Spades,Four Of Clubs,Four Of Diamonds,Four Of Hearts,Five Of Spades,Five Of Clubs,Five Of Diamonds,Five Of Hearts,
-   Six Of Spades,Six Of Clubs,Six Of Diamonds,Six Of Hearts,Seven Of Spades,Seven Of Clubs,Seven Of Diamonds,Seven Of Hearts,
-   Eight Of Spades,Eight Of Clubs,Eight Of Diamonds,Eight Of Hearts,Nine Of Spades,Nine Of Clubs,Nine Of Diamonds,Nine Of Hearts,
-   Ten Of Spades,Ten Of Clubs,Ten Of Diamonds,Ten Of Hearts,Jack Of Spades,Jack Of Clubs,Jack Of Diamonds,Jack Of Hearts,
-   Queen Of Spades,Queen Of Clubs,Queen Of Diamonds,Queen Of Hearts,King Of Spades,King Of Clubs,King Of Diamonds,King Of Hearts,
-   Ace Of Spades,Ace Of Clubs,Ace Of Diamonds,Ace Of Hearts]" 
+   EXAMPLE: makeDeck == "[Card Two Spades,Card Two Clubs,Card Two Diamonds,Card Two Hearts,Card Three Spades,Card Three Clubs,Card Three Diamonds,Card Three Hearts,
+   Card Four Spades,Card Four Clubs,Card Four Diamonds,Card Four Hearts,Card Five Spades,Card Five Clubs,Card Five Diamonds,Card Five Hearts,
+   Card Six Spades,Card Six Clubs,Card Six Diamonds,Card Six Hearts,Card Seven Spades,Card Seven Clubs,Card Seven Diamonds,Card Seven Hearts,
+   Card Eight Spades,Card Eight Clubs,Card Eight Diamonds,Card Eight Hearts,Card Nine Spades,Card Nine Clubs,Card Nine Diamonds,Card Nine Hearts,
+   Card Ten Spades,Card Ten Clubs,Card Ten Diamonds,Card Ten Hearts,Card Jack Spades,Card Jack Clubs,Card Jack Diamonds,Card Jack Hearts,
+   Card Queen Spades,Card Queen Clubs,Card Queen Diamonds,Card Queen Hearts,Card King Spades,Card King Clubs,Card King Diamonds,Card King Hearts,
+   Card Ace Spades,Card Ace Clubs,Card Ace Diamonds,Card Ace Hearts]" 
 -}
 makeDeck :: Deck
 makeDeck = [Card cardtypes suits | cardtypes <- [Two ..], suits <- [Spades ..]]
@@ -237,10 +238,11 @@ dealerDrawCard gs = gs { dealerHand = dealerHand gs ++ [head $ deck gs], deck = 
    Calculates the value of "hand"
    RETURNS: The integer value of "hand"
    EXAMPLES: calculateHand [] == 0
-             calculateHand [Two Of Spades,Two Of Clubs] == 4
-             calculateHand [King Of Spades,King Of Clubs,King Of Diamonds] == 30        
+             calculateHand [Card Two Spades,Card Two Clubs] == 4
+             calculateHand [Card King Spades, Card King Clubs, Card King Diamonds] == 30        
 -}
 calculateHand :: Hand -> Int
+--Variant: length hand 
 calculateHand [] = 0
 calculateHand (x:[]) = cardValue x
 calculateHand (x:xs) = cardValue x + calculateHand xs
@@ -248,11 +250,12 @@ calculateHand (x:xs) = cardValue x + calculateHand xs
 {- hasAce hand
    Checks if "hand" contains an Ace
    RETURNS: A boolean depending on if "hand" contains an ace
-   EXAMPLES: hasAce [Two Of Spades,Two Of Clubs] == False
-             hasAce [Ace Of Spades,Two Of Clubs] == True
-             hasAce [King Of Spades,King Of Clubs,Ace Of Diamonds,Two Of Spades] == True         
+   EXAMPLES: hasAce [Card Two Spades,Card Two Clubs] == False
+             hasAce [Card Ace Spades,Card Two Clubs] == True
+             hasAce [Card King Spades,Card King Clubs, Card Ace Diamonds, Card Two Spades] == True         
 -}
 hasAce :: Hand -> Bool
+--Variant: length hand
 hasAce [] = False 
 hasAce ((Card Ace _): _) = True 
 hasAce (x:xs) = hasAce xs
@@ -261,9 +264,9 @@ hasAce (x:xs) = hasAce xs
    Checks if the Aces should have the value 1 or 11
    RETURNS: The integer value of "hand" in regard to the Aces.
    EXAMPLES: calculateAceHand [] == 0
-             calculateAceHand [Ace Of Spades, Ace Of Hearts] == 12
-             calculateAceHand [Ace Of Spades, King Of Hearts, King Of Spades] == 21
-             calculateAceHand [Two Of Spades, Three Of Hearts, Ace Of Hearts] == 16     
+             calculateAceHand [Card Ace Spades, Card Ace Hearts] == 12
+             calculateAceHand [Card Ace Spades, Card King Hearts, Card King Spades] == 21
+             calculateAceHand [Card Two Spades, Card Three Hearts, Card Ace Hearts] == 16     
 -}
 calculateAceHand :: Hand -> Int
 calculateAceHand [] = 0
@@ -272,10 +275,10 @@ calculateAceHand hand = if hasAce hand && (calculateHand hand + 10 <= 21) then c
 {- cardValue card
    Gives the card a integer value.
    RETURNS: The integer value of "card"
-   EXAMPLES: cardValue (Two Of Spades) == 2
-             cardValue (Three Of Clubs) == 3
-             cardValue (Ten Of Diamonds) == 10
-             cardValue (Ace Of Diamonds) == 11
+   EXAMPLES: cardValue (Card Two Spades) == 2
+             cardValue (Card Three Clubs) == 3
+             cardValue (Card Ten Diamonds) == 10
+             cardValue (Card Ace Diamonds) == 1
 -}
 cardValue :: Card -> Int
 cardValue (Card Two _) = 2
@@ -301,6 +304,7 @@ cardValue (Card Ace _) = 1
              handToString [Two Of Spades,Two Of Clubs,King Of Spades] == "Two Of Spades, Two Of Clubs, King Of Spades"              
 -}
 handToString :: Hand -> String
+--Variant: length hand
 handToString (x:[]) = show x
 handToString (x:xs) = show x ++ "\n     | " ++ handToString xs
 
@@ -333,9 +337,9 @@ fisherYates gen l =
 {- gameOver hand
    Updates bool if hand limit is reached
    RETURNS: A boolean that depends on the value of "hand"    
-   EXAMPLES: gameOver [King Of Spades,King Of Clubs,King Of Diamonds] == True
-             gameOver [Two Of Spades,Two Of Clubs] == False
-             gameOver [Eight Of Clubs,Two Of Spades,Six Of Spades] == False
+   EXAMPLES: gameOver [Card King Spades, Card King Clubs, Card King Diamonds] == True
+             gameOver [Card Two Spades, Card Two Clubs] == False
+             gameOver [Card Eight Clubs, Card Two Spades,Card Six Spades] == False
 -}
 gameOver :: Hand -> Bool
 gameOver hand = calculateAceHand hand > 21
